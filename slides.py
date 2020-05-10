@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
-from preview import getSlides, getUrls, getCaption, getImgs
+from preview import getUrls, getImgs
 import yaml
-from telegram.ext import Updater, InputMediaPhoto
+from telegram.ext import Updater
+from telegram import InputMediaPhoto
 from existing import Existing
 import os
 import sys
 import album_sender
 from telegram_util import AlbumResult as Result
+import pic_cut
 
 existing = Existing()
 
@@ -19,21 +21,20 @@ tele = Updater(credential['bot_token'], use_context=True) # translate bot, adhoc
 debug_group = tele.bot.get_chat(420074357)
 channel = tele.bot.get_chat('@web_record')
 
-def send(imgs, url):
+def send(chat, imgs):
 	group = []
 	for img in imgs:
-		cap = img['alt'] + '[source](%s)' % url
-		group.append([InputMediaPhoto(img['data-lazy'],
-			caption=cap, parse_mode='Markdown')])
+		fn = pic_cut.getCutImages([img['data-lazy']], 1)[0]
+		group.append(InputMediaPhoto(open(fn, 'rb'), caption=img['alt']))
 		if len(group) == 9:
 			break
-	chat.bot.send_media_group(debug_group.id, group)
+	chat.bot.send_media_group(chat.id, group)
 
 for url in getUrls():
 	if existing.contain(url):
 		continue
-	send(getImgs(url), url)
+	send(debug_group, getImgs(url))
 	if 'test' not in sys.argv:
 		existing.add(url)
-	return # testing
+	break # testing
 
