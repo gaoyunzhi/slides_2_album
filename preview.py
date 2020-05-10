@@ -1,20 +1,19 @@
 from bs4 import BeautifulSoup
 import cached_url
 
-def getSoup(name, pos):
-	url = 'https://t.me/s/%s/%d' % (name, pos)
-	content = cached_url.get(url, force_cache = True)
-	return BeautifulSoup(content, 'html.parser')
+DOMAIN = 'https://cn.reuters.com'
 
-def getNextPos(name, pos):
-	soup = getSoup(name, pos)
-	next_pos = pos
-	for item in soup.find_all('div', class_='tgme_widget_message'):
-		next_pos = int(item.get('data-post', '').split('/')[-1]) + 1
-	return next_pos
+def getUrls():
+	root = DOMAIN + '/news/archive/specialEvents27'
+	b = BeautifulSoup(cached_url.get(root), 'html.parser')
+	for item in b.find_all('div', class_='story-content'):
+		yield item.find('a')['href']
 
-def getLinks(name, pos):
-	soup = getSoup(name, pos)
-	for item in soup.find_all('a', class_='tgme_widget_message_link_preview'):
-		yield item['href']
+def getSlides(url):
+	b = BeautifulSoup(cached_url.get(DOMAIN + url, force_cache=True), 'html.parser')
+	for item in b.find_all('div', class_='slide-image-enclosure'):
+		img = item.find('img')
+		yield img['data-lazy']
+		img['alt'] # todo add caption
+
 
