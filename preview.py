@@ -14,12 +14,4 @@ def getImgs(url):
 	for item in b.find_all('div', class_='slide-image-enclosure'):
 		yield item.find('img')
 
-def getSlides(url):
-	for img in getImgs(url):
-		yield img['data-lazy']
-
-def getCaption(url):
-	for img in getImgs(url):
-		yield img['alt']
-
 
