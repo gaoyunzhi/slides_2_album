@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from bs4 import BeautifulSoup
 from preview import getUrls, getImgs
 import yaml
 from telegram.ext import Updater
 from telegram import InputMediaPhoto
 from existing import Existing
-import os
 import sys
-import album_sender
 from telegram_util import AlbumResult as Result
 import pic_cut
 
@@ -29,12 +26,12 @@ def send(chat, imgs):
 		if len(group) == 9:
 			break
 	chat.bot.send_media_group(chat.id, group)
+	time.sleep(15)
 
 for url in getUrls():
 	if existing.contain(url):
 		continue
-	send(debug_group, getImgs(url))
+	send(channel, getImgs(url))
 	if 'test' not in sys.argv:
 		existing.add(url)
-	break # testing
 
