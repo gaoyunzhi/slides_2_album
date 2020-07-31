@@ -9,6 +9,7 @@ from existing import Existing
 import sys
 from telegram_util import AlbumResult as Result
 import pic_cut
+import time
 
 existing = Existing()
 
